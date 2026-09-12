@@ -337,6 +337,9 @@ footer .fnote{font-family:var(--mono);font-size:10.5px;letter-spacing:1px;color:
   .hgroup .who{font-size:13px}
   .btn{padding:6px 9px;font-size:11px}
   .chip{font-size:10px;padding:3px 8px}
+  nav button.tab{flex:1 0 auto;justify-content:center;padding:10px 8px;font-size:13px;gap:6px}
+  nav button.tab .no{font-size:10px}
+  nav button.tab .en{display:none}
   main{padding:16px 12px 150px}
   .scan{padding:16px;gap:16px}
   .scan .qr{width:132px;height:132px}
@@ -552,11 +555,11 @@ const CONFIG = {
     { k: "NET · Bilibili 主页", v: "@141575811", href: "https://space.bilibili.com/141575811" },
   ],
   aiLines: {
-    s1: "档案已解密:Keyou,视觉设计师,档案号 K-0428。左上角的 K 和二维码中央的 K 是同一枚——都归你。",
-    s2: "五件装备全部在线:Blender 九成,Adobe 四件套护航。留下一成,是给下一个项目准备的。",
-    s3: "被客户从荣华道具挖到成角科技出任总设计师——任务记录,永远比自夸更有说服力。",
-    s4: "计算机科班出身,工具学得明白;但殖民地发奖励看的是产出,不是文凭。",
-    s5: "邮箱、电话、B 站都在这了。你说过更喜欢线上交流——那就从这个页面开始。",
+    s1: "欢迎查阅 Keyou 的可交互档案。视觉设计师,三年设计实践——建议从任务记录开始看。",
+    s2: "五件常用装备:Blender 全流程独立产出,Adobe 四件套辅助协作。数字是熟练度,不是上限。",
+    s3: "两段经历一个共同点:作品被客户记住,离职后仍被请回重任总设计师。",
+    s4: "计算机科班出身,工具与逻辑是底座;视觉表达,是长在上面的一切。",
+    s5: "邮箱、电话、B 站主页均已开放。也可以扫描页面中的二维码,把这份档案带走。",
   },
 };
 /* ================= 以下为渲染与交互逻辑,一般无需改动 ================= */
