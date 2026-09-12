@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>【姓名】 // UESC 人事档案</title>
+<style>
+/* ============================================================
+   MARATHON 风格可交互简历 — "GRAPHIC REALISM / 图形复古未来主义"
+   风格要点: 平涂色块 / 硬边几何 / 品牌化贴纸 / 终端文化 / 无锈无螺丝
+   ============================================================ */
+
+/* ---------- 主题变量:白天 = 企业档案 ---------- */
+:root{
+  --paper:#E8E3D5;      /* 暖白纸底 */
+  --panel:#F4F0E4;      /* 卡片面 */
+  --ink:#191713;        /* 油墨黑 */
+  --ink-soft:#4A463C;
+  --orange:#FF4B1F;     /* 信号橙 */
+  --blue:#1E4FFF;       /* 钴蓝 */
+  --yellow:#FFB800;     /* 警示黄 */
+  --teal:#0E9E8E;
+  --line:3px solid var(--ink);
+  --shadow:6px 6px 0 var(--ink);
+  --disp:"Arial Black","Arial Bold","Microsoft YaHei",sans-serif;
+  --mono:"Cascadia Code","Consolas","Courier New",monospace;
+  --cjk:"Microsoft YaHei","PingFang SC",sans-serif;
+}
+/* ---------- 主题变量:夜晚 = 磷光终端(1994 致敬) ---------- */
+body.night{
+  --paper:#0A0F0B;
+  --panel:#101711;
+  --ink:#45FF7A;        /* 磷光绿 */
+  --ink-soft:#2E9A55;
+  --orange:#FFB300;     /* 琥珀橙 */
+  --blue:#37E0C8;
+  --yellow:#FFE066;
+  --teal:#37E0C8;
+  --shadow:6px 6px 0 #122417;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--cjk);
+  overflow-x:hidden;
+  transition:background .35s,color .35s;
+}
+/* 纸面细点阵纹理(白天可见) */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:radial-gradient(rgba(25,23,19,.10) .8px,transparent .8px);
+  background-size:7px 7px;
+}
+body.night::before{opacity:.25}
+/* 夜间扫描线 */
+body.night::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:60;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px);
+}
+::selection{background:var(--orange);color:var(--paper)}
+
+/* ================= 启动接入动画 ================= */
+#boot{
+  position:fixed;inset:0;z-index:100;background:#070B08;color:#45FF7A;
+  font-family:var(--mono);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+}
+#boot.done{display:none}
+#boot .inner{width:min(680px,90vw)}
+#boot .log{min-height:220px;font-size:15px;line-height:1.9;white-space:pre-wrap}
+#boot .log .ok{color:#FFB300}
+#boot .bar{height:14px;border:2px solid #45FF7A;margin:18px 0 22px;position:relative}
+#boot .bar i{position:absolute;inset:2px;width:0;background:#45FF7A;transition:width .2s}
+#boot .enter{
+  display:none;border:3px solid #45FF7A;background:transparent;color:#45FF7A;
+  font-family:var(--disp);font-size:20px;padding:14px 34px;letter-spacing:3px;cursor:pointer;
+}
+#boot .enter:hover{background:#45FF7A;color:#070B08}
+#boot .enter.show{display:inline-block;animation:blinkCaret 1.2s step-end infinite}
+@keyframes blinkCaret{50%{opacity:.55}}
+
+/* ================= 顶栏 ================= */
+header{
+  position:relative;z-index:5;display:flex;align-items:center;gap:14px;
+  padding:14px 22px;border-bottom:var(--line);background:var(--panel);
+  flex-wrap:wrap;
+}
+.emblem{width:46px;height:46px;flex:0 0 auto;cursor:pointer}
+.emblem svg{width:100%;height:100%;display:block}
+.emblem:hover svg .mfill{fill:var(--orange)}
+.hgroup{line-height:1.15}
+.hgroup .sys{font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--ink-soft)}
+.hgroup .who{font-family:var(--disp);font-size:16px;text-transform:uppercase}
+.hspacer{flex:1}
+.chip{
+  font-family:var(--mono);font-size:11px;letter-spacing:1px;border:2px solid var(--ink);
+  padding:4px 10px;background:var(--paper);white-space:nowrap;
+}
+.chip.status{background:var(--yellow);font-weight:bold}
+.chip.status::before{content:"●";color:var(--orange);margin-right:6px;animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.35}}
+.btn{
+  font-family:var(--mono);font-size:12px;letter-spacing:1px;border:2px solid var(--ink);
+  background:var(--paper);color:var(--ink);padding:6px 12px;cursor:pointer;
+  box-shadow:3px 3px 0 var(--ink);transition:transform .08s,box-shadow .08s;
+}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink)}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.btn.primary{background:var(--orange);color:var(--paper)}
+
+/* ================= 赞助商跑马灯 ================= */
+.ticker{
+  position:relative;z-index:4;overflow:hidden;border-bottom:var(--line);
+  background:var(--ink);color:var(--paper);height:34px;display:flex;align-items:center;
+}
+body.night .ticker{background:#122417;color:#45FF7A}
+.ticker .lane{display:flex;gap:0;white-space:nowrap;animation:lane 26s linear infinite;will-change:transform}
+.ticker span{font-family:var(--mono);font-size:12px;letter-spacing:2px;padding:0 26px;position:relative}
+.ticker span::after{content:"◆";position:absolute;right:-7px;color:var(--orange)}
+@keyframes lane{to{transform:translateX(-50%)}}
+
+/* ================= 布局:左侧导航 + 舞台 ================= */
+.wrap{display:flex;position:relative;z-index:2;min-height:calc(100vh - 96px)}
+nav{
+  flex:0 0 190px;border-right:var(--line);background:var(--panel);
+  padding:22px 0;display:flex;flex-direction:column;gap:2px;position:sticky;top:0;
+  align-self:flex-start;height:calc(100vh - 96px);
+}
+nav .rail-cap{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--ink-soft);padding:0 20px 12px}
+nav button.tab{
+  display:flex;align-items:baseline;gap:10px;text-align:left;border:0;cursor:pointer;
+  background:transparent;color:var(--ink);font-family:var(--cjk);font-size:15px;font-weight:bold;
+  padding:12px 20px;border-left:6px solid transparent;transition:background .15s,border-color .15s;
+}
+nav button.tab .no{font-family:var(--mono);font-size:12px;color:var(--ink-soft)}
+nav button.tab .en{display:block;font-family:var(--mono);font-weight:normal;font-size:10px;letter-spacing:2px;color:var(--ink-soft);margin-top:2px}
+nav button.tab:hover{background:rgba(25,23,19,.06)}
+body.night nav button.tab:hover{background:rgba(69,255,122,.08)}
+nav button.tab.active{background:var(--orange);color:var(--paper);border-left-color:var(--ink)}
+body.night nav button.tab.active{background:var(--orange);color:#0A0F0B}
+nav button.tab.active .no,nav button.tab.active .en{color:inherit}
+nav .rail-foot{margin-top:auto;padding:14px 20px 0;font-family:var(--mono);font-size:10px;color:var(--ink-soft);line-height:1.8}
+kbd{border:1.5px solid var(--ink-soft);border-radius:2px;padding:0 4px;font-family:var(--mono);font-size:10px}
+
+main{flex:1;min-width:0;padding:26px 28px 90px}
+
+/* ================= 区块面板 ================= */
+.panel{display:none;max-width:1060px}
+.panel.active{display:block;animation:slideIn .38s cubic-bezier(.2,.9,.25,1)}
+@keyframes slideIn{from{opacity:0;transform:translateY(26px) skewY(.6deg)}to{opacity:1;transform:none}}
+
+.sec-head{display:flex;align-items:flex-end;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+.sec-tag{
+  font-family:var(--mono);font-size:12px;letter-spacing:2px;background:var(--ink);
+  color:var(--paper);padding:6px 12px;
+}
+body.night .sec-tag{background:#122417;color:#45FF7A}
+.sec-title{font-family:var(--disp);font-size:clamp(30px,5vw,52px);text-transform:uppercase;letter-spacing:-1px;line-height:1}
+.sec-title .cn{font-family:var(--cjk);font-weight:900}
+.sec-ghost{
+  margin-left:auto;font-family:var(--disp);font-size:clamp(60px,10vw,120px);line-height:.8;
+  color:transparent;-webkit-text-stroke:2px var(--ink);opacity:.14;user-select:none;
+}
+
+/* 缺角卡片(产品设计的"无螺丝"语言) */
+.card{
+  background:var(--panel);border:var(--line);box-shadow:var(--shadow);
+  padding:22px 24px;position:relative;margin-bottom:22px;
+  clip-path:polygon(0 0,calc(100% - 22px) 0,100% 22px,100% 100%,0 100%);
+}
+.card .tag{
+  position:absolute;bottom:-3px;right:-3px;background:var(--orange);color:var(--paper);
+  font-family:var(--mono);font-size:11px;letter-spacing:1px;padding:4px 10px;
+}
+body.night .card .tag{color:#0A0F0B}
+
+/* --- M-01 档案 --- */
+.name-xl{
+  font-family:var(--disp);font-size:clamp(44px,8vw,96px);line-height:.98;letter-spacing:-2px;
+  text-transform:uppercase;position:relative;display:inline-block;
+}
+.name-xl .cn{font-family:var(--cjk);font-weight:900}
+.role-line{
+  display:inline-block;margin-top:12px;background:var(--ink);color:var(--paper);
+  font-family:var(--mono);font-size:clamp(13px,2vw,17px);letter-spacing:2px;padding:8px 16px;
+}
+body.night .role-line{background:#122417;color:#45FF7A}
+.glitch{position:relative}
+.glitch::before,.glitch::after{
+  content:attr(data-t) / "";position:absolute;inset:0;overflow:hidden;pointer-events:none;opacity:0;
+}
+.glitch::before{color:var(--blue);animation:gl1 2.4s infinite steps(1)}
+.glitch::after{color:var(--orange);animation:gl2 2.4s infinite steps(1)}
+@keyframes gl1{0%,92%,100%{opacity:0}93%{opacity:.8;transform:translate(-3px,2px);clip-path:inset(10% 0 55% 0)}96%{opacity:.8;transform:translate(3px,-1px);clip-path:inset(60% 0 12% 0)}}
+@keyframes gl2{0%,94%,100%{opacity:0}95%{opacity:.8;transform:translate(3px,1px);clip-path:inset(30% 0 40% 0)}98%{opacity:.8;transform:translate(-3px,0);clip-path:inset(70% 0 5% 0)}}
+.meta-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-top:26px}
+.meta-cell{border:2px solid var(--ink);padding:12px 14px;background:var(--paper)}
+body.night .meta-cell{background:#0E140F}
+.meta-cell .k{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--ink-soft)}
+.meta-cell .v{font-weight:bold;font-size:15px;margin-top:5px}
+.summary{margin-top:22px;font-size:15px;line-height:2;max-width:70ch}
+.summary b{background:linear-gradient(transparent 62%,var(--yellow) 62%)}
+
+/* --- M-02 装备(技能) --- */
+.loadout{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.module{border:var(--line);background:var(--panel);box-shadow:var(--shadow);padding:18px 18px 20px;position:relative;
+  clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,0 100%)}
+.module .mk{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--ink-soft)}
+.module h3{font-size:17px;margin:6px 0 4px}
+.module .desc{font-size:12.5px;color:var(--ink-soft);line-height:1.8;min-height:40px}
+.track{height:16px;border:2px solid var(--ink);margin:12px 0 8px;position:relative;background:var(--paper)}
+body.night .track{background:#0E140F}
+.track i{
+  position:absolute;inset:1px auto 1px 1px;width:0;display:block;
+  background:repeating-linear-gradient(-45deg,var(--orange) 0 8px,#D63A12 8px 12px);
+  transition:width 1s cubic-bezier(.2,.8,.2,1);
+}
+body.night .track i{background:repeating-linear-gradient(-45deg,var(--orange) 0 8px,#B27F00 8px 12px)}
+.track .pct{position:absolute;right:6px;top:-1px;font-family:var(--mono);font-size:11px;font-weight:bold;color:var(--ink)}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tags em{font-style:normal;font-family:var(--mono);font-size:10.5px;border:1.5px solid var(--ink);padding:2px 8px;background:var(--paper)}
+body.night .tags em{background:#0E140F}
+.tags em.hot{background:var(--yellow)}
+
+/* --- M-03 任务记录(经历) --- */
+.timeline{border-left:var(--line);margin-left:8px;padding-left:26px;position:relative}
+.tl-item{position:relative;margin-bottom:26px}
+.tl-item::before{
+  content:"";position:absolute;left:-35px;top:8px;width:14px;height:14px;
+  background:var(--orange);border:3px solid var(--ink);
+}
+.tl-item.current::before{animation:pulse 1.6s infinite}
+.tl-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.tl-head .org{font-family:var(--disp);font-size:clamp(18px,3vw,26px);text-transform:uppercase}
+.tl-head .role{background:var(--blue);color:var(--paper);font-size:12.5px;font-weight:bold;padding:3px 10px}
+body.night .tl-head .role{color:#0A0F0B}
+.tl-head .date{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--ink-soft);letter-spacing:1px}
+.tl-item ul{list-style:none;margin-top:10px}
+.tl-item li{font-size:14px;line-height:1.9;padding-left:1.4em;position:relative}
+.tl-item li::before{content:"▸";position:absolute;left:0;color:var(--orange);font-weight:bold}
+.result-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.result-chips em{font-style:normal;font-family:var(--mono);font-size:11px;background:var(--yellow);border:2px solid var(--ink);padding:2px 9px;font-weight:bold}
+
+/* --- M-04 训练 --- */
+.edu-flex{display:flex;gap:22px;flex-wrap:wrap}
+.edu-flex .card{flex:1 1 340px;margin-bottom:0}
+.cert-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.cert-list em{font-style:normal;font-family:var(--mono);font-size:11.5px;border:2px solid var(--ink);padding:5px 12px;background:var(--paper)}
+body.night .cert-list em{background:#0E140F}
+
+/* --- M-05 通讯 --- */
+.comms{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
+.comm{display:block;text-decoration:none;color:var(--ink);border:var(--line);background:var(--panel);
+  box-shadow:var(--shadow);padding:20px;transition:transform .15s,box-shadow .15s;
+  clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,0 100%)}
+.comm:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 var(--orange)}
+.comm .ck{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--ink-soft)}
+.comm .cv{font-family:var(--disp);font-size:16px;margin-top:8px;word-break:break-all}
+.comm .cv .cn{font-family:var(--cjk);font-weight:900}
+.cta{
+  margin-top:26px;display:flex;justify-content:center;
+}
+.cta a{
+  display:inline-block;text-decoration:none;background:var(--orange);color:var(--paper);
+  font-family:var(--disp);font-size:clamp(18px,3vw,26px);letter-spacing:2px;padding:18px 44px;
+  border:var(--line);box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s;
+}
+body.night .cta a{color:#0A0F0B}
+.cta a:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 var(--ink)}
+
+/* --- 扫码卡片 --- */
+.scan{display:flex;gap:26px;align-items:center;border:var(--line);background:var(--panel);
+  box-shadow:var(--shadow);padding:22px 26px;margin-top:22px;flex-wrap:wrap;position:relative;
+  clip-path:polygon(0 0,calc(100% - 22px) 0,100% 22px,100% 100%,0 100%)}
+.scan .qr{width:176px;height:176px;flex:0 0 auto;border:3px solid var(--ink);background:var(--paper);padding:8px}
+.scan .qr svg{width:100%;height:100%;display:block}
+.scan .info{flex:1;min-width:230px}
+.scan .info .sk{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--ink-soft)}
+.scan .info h3{font-family:var(--disp);font-size:22px;margin:8px 0 6px;text-transform:uppercase}
+.scan .info .url{font-family:var(--mono);font-size:12px;word-break:break-all;border:1.5px solid var(--ink);
+  display:inline-block;padding:4px 10px;background:var(--paper);margin:4px 0 10px}
+body.night .scan .info .url{background:#0E140F}
+.scan .info .note{font-size:12px;color:var(--ink-soft);line-height:1.8}
+
+/* ================= AI 注解终端 ================= */
+#ai{
+  position:fixed;right:18px;bottom:18px;z-index:50;width:min(340px,calc(100vw - 36px));
+  background:#0C120D;border:3px solid #45FF7A;box-shadow:8px 8px 0 rgba(25,23,19,.55);
+  font-family:var(--mono);color:#45FF7A;
+}
+#ai .ai-head{display:flex;align-items:center;gap:8px;background:#45FF7A;color:#0C120D;padding:6px 10px;cursor:pointer;user-select:none}
+#ai .ai-head .dot{width:9px;height:9px;background:#FF4B1F;animation:pulse 1.4s infinite}
+#ai .ai-head b{font-size:12px;letter-spacing:2px}
+#ai .ai-head .min{margin-left:auto;font-size:12px}
+#ai .ai-body{padding:12px 14px;font-size:12.5px;line-height:1.9;min-height:74px}
+#ai .ai-body::after{content:"▌";animation:blinkCaret 1s step-end infinite;color:#FFB300}
+#ai.min .ai-body{display:none}
+
+/* ================= 页脚 ================= */
+footer{
+  position:relative;z-index:2;border-top:var(--line);background:var(--panel);
+  padding:18px 24px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+}
+.barcode{height:34px;width:170px;background:repeating-linear-gradient(90deg,var(--ink) 0 2px,transparent 2px 5px,var(--ink) 5px 7px,transparent 7px 11px,var(--ink) 11px 12px,transparent 12px 15px)}
+footer .fnote{font-family:var(--mono);font-size:10.5px;letter-spacing:1px;color:var(--ink-soft);line-height:1.8}
+
+/* ================= 打印:变成干净简历 ================= */
+@media print{
+  body::before,body.night::after,#boot,#ai,nav,.ticker,header .btn,#kbdhint{display:none!important}
+  body{background:#fff;color:#111}
+  body::before{display:none}
+  .wrap{display:block}
+  main{padding:0}
+  .panel{display:block!important;max-width:none;page-break-inside:avoid;margin-bottom:14mm}
+  .card,.module,.comm{box-shadow:none;break-inside:avoid}
+  .sec-ghost{display:none}
+  .name-xl{font-size:40px}
+  #ai{display:none}
+}
+
+/* ================= 响应式 ================= */
+@media (max-width:900px){
+  .wrap{flex-direction:column}
+  nav{position:static;flex:0 0 auto;flex-direction:row;overflow-x:auto;height:auto;border-right:0;border-bottom:var(--line);padding:0}
+  nav .rail-cap,nav .rail-foot{display:none}
+  nav button.tab{border-left:0;border-bottom:6px solid transparent;white-space:nowrap;padding:12px 16px}
+  nav button.tab.active{border-bottom-color:var(--ink)}
+  main{padding:20px 16px 120px}
+}
+/* 小屏:手机窗口 */
+@media (max-width:640px){
+  header{padding:10px 12px;gap:10px}
+  .hspacer{display:none}
+  .emblem{width:38px;height:38px}
+  .hgroup .who{font-size:13px}
+  .btn{padding:6px 9px;font-size:11px}
+  .chip{font-size:10px;padding:3px 8px}
+  main{padding:16px 12px 150px}
+  .scan{padding:16px;gap:16px}
+  .scan .qr{width:132px;height:132px}
+  #ai{left:10px;right:10px;bottom:10px;width:auto}
+  #ai .ai-body{min-height:0;max-height:8.5em;overflow:auto}
+}
+/* ================= 动效减弱 ================= */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ 启动接入动画 ============ -->
+<div id="boot" role="button" aria-label="点击跳过启动动画">
+  <div class="inner">
+    <div class="log" id="bootlog"></div>
+    <div class="bar"><i id="bootbar"></i></div>
+    <button class="enter" id="bootEnter">接入 // JACK IN ⏎</button>
+  </div>
+</div>
+
+<!-- ============ 顶栏 ============ -->
+<header>
+  <div class="emblem" id="emblem" title="UESC 档案徽标">
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <rect x="2" y="2" width="60" height="60" fill="none" stroke="currentColor" stroke-width="4"/>
+      <polygon class="mfill" points="16,18 24,18 24,29 34,18 43,18 30,32 43,48 34,48 24,36 24,48 16,48" fill="currentColor"/>
+      <rect x="14" y="52" width="36" height="4" fill="currentColor"/>
+    </svg>
+  </div>
+  <div class="hgroup">
+    <div class="sys">UESC // PERSONNEL FILE · TAU CETI IV</div>
+    <div class="who" id="headName">RUNNER DOSSIER</div>
+  </div>
+  <div class="hspacer"></div>
+  <span class="chip status" id="statusChip">READY</span>
+  <button class="btn" id="themeBtn" title="切换主题 (T)">◐ 档案 / 终端</button>
+  <button class="btn primary" id="printBtn" title="打印或导出 PDF (P)">⎙ 打印简历</button>
+</header>
+
+<!-- ============ 赞助商跑马灯 ============ -->
+<div class="ticker" aria-hidden="true"><div class="lane" id="tickerLane"></div></div>
+
+<div class="wrap">
+  <!-- ============ 左侧导航 ============ -->
+  <nav id="nav" aria-label="简历分区">
+    <div class="rail-cap">MISSION CONSOLE</div>
+    <button class="tab active" data-sec="s1"><span class="no">M-01</span><span>档案<span class="en">PROFILE</span></span></button>
+    <button class="tab" data-sec="s2"><span class="no">M-02</span><span>装备<span class="en">LOADOUT</span></span></button>
+    <button class="tab" data-sec="s3"><span class="no">M-03</span><span>任务记录<span class="en">MISSION LOG</span></span></button>
+    <button class="tab" data-sec="s4"><span class="no">M-04</span><span>训练<span class="en">TRAINING</span></span></button>
+    <button class="tab" data-sec="s5"><span class="no">M-05</span><span>通讯<span class="en">COMMS</span></span></button>
+    <div class="rail-foot" id="kbdhint">
+      <kbd>1</kbd>–<kbd>5</kbd> 切换区块<br>
+      <kbd>T</kbd> 主题 <kbd>P</kbd> 打印
+    </div>
+  </nav>
+
+  <!-- ============ 舞台 ============ -->
+  <main id="stage">
+    <section class="panel active" id="s1">
+      <div class="sec-head">
+        <span class="sec-tag">M-01 // PERSONNEL</span>
+        <h1 class="sec-title"><span class="cn">跑者档案</span></h1>
+        <span class="sec-ghost">01</span>
+      </div>
+      <div class="card">
+        <span class="tag">DECRYPTED</span>
+        <div class="name-xl glitch" data-t="【姓名】" id="bigName">【姓名】</div>
+        <div><span class="role-line" id="bigRole">视觉设计师 · VISUAL DESIGNER</span></div>
+        <div class="meta-grid" id="metaGrid"></div>
+        <p class="summary" id="summary"></p>
+      </div>
+    </section>
+
+    <section class="panel" id="s2">
+      <div class="sec-head">
+        <span class="sec-tag">M-02 // LOADOUT</span>
+        <h2 class="sec-title"><span class="cn">技能装备</span></h2>
+        <span class="sec-ghost">02</span>
+      </div>
+      <div class="loadout" id="loadout"></div>
+    </section>
+
+    <section class="panel" id="s3">
+      <div class="sec-head">
+        <span class="sec-tag">M-03 // MISSION LOG</span>
+        <h2 class="sec-title"><span class="cn">任务记录</span></h2>
+        <span class="sec-ghost">03</span>
+      </div>
+      <div class="timeline" id="timeline"></div>
+    </section>
+
+    <section class="panel" id="s4">
+      <div class="sec-head">
+        <span class="sec-tag">M-04 // TRAINING</span>
+        <h2 class="sec-title"><span class="cn">训练档案</span></h2>
+        <span class="sec-ghost">04</span>
+      </div>
+      <div class="edu-flex" id="edu"></div>
+    </section>
+
+    <section class="panel" id="s5">
+      <div class="sec-head">
+        <span class="sec-tag">M-05 // COMMS</span>
+        <h2 class="sec-title"><span class="cn">通讯频道</span></h2>
+        <span class="sec-ghost">05</span>
+      </div>
+      <div class="comms" id="comms"></div>
+      <!--QR-START-->
+      <div class="scan">
+        <div class="qr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 45 45" shape-rendering="crispEdges"><rect x="-4" y="-4" width="45" height="45" fill="#E8E3D5"/><path d="M0 0h1v1h-1zM1 0h1v1h-1zM2 0h1v1h-1zM3 0h1v1h-1zM4 0h1v1h-1zM5 0h1v1h-1zM6 0h1v1h-1zM8 0h1v1h-1zM12 0h1v1h-1zM14 0h1v1h-1zM15 0h1v1h-1zM20 0h1v1h-1zM21 0h1v1h-1zM22 0h1v1h-1zM24 0h1v1h-1zM26 0h1v1h-1zM30 0h1v1h-1zM31 0h1v1h-1zM32 0h1v1h-1zM33 0h1v1h-1zM34 0h1v1h-1zM35 0h1v1h-1zM36 0h1v1h-1zM0 1h1v1h-1zM6 1h1v1h-1zM8 1h1v1h-1zM12 1h1v1h-1zM15 1h1v1h-1zM16 1h1v1h-1zM17 1h1v1h-1zM18 1h1v1h-1zM20 1h1v1h-1zM22 1h1v1h-1zM23 1h1v1h-1zM24 1h1v1h-1zM26 1h1v1h-1zM27 1h1v1h-1zM28 1h1v1h-1zM30 1h1v1h-1zM36 1h1v1h-1zM0 2h1v1h-1zM2 2h1v1h-1zM3 2h1v1h-1zM4 2h1v1h-1zM6 2h1v1h-1zM8 2h1v1h-1zM9 2h1v1h-1zM10 2h1v1h-1zM16 2h1v1h-1zM21 2h1v1h-1zM26 2h1v1h-1zM27 2h1v1h-1zM30 2h1v1h-1zM32 2h1v1h-1zM33 2h1v1h-1zM34 2h1v1h-1zM36 2h1v1h-1zM0 3h1v1h-1zM2 3h1v1h-1zM3 3h1v1h-1zM4 3h1v1h-1zM6 3h1v1h-1zM10 3h1v1h-1zM12 3h1v1h-1zM15 3h1v1h-1zM17 3h1v1h-1zM20 3h1v1h-1zM21 3h1v1h-1zM22 3h1v1h-1zM23 3h1v1h-1zM24 3h1v1h-1zM25 3h1v1h-1zM26 3h1v1h-1zM27 3h1v1h-1zM28 3h1v1h-1zM30 3h1v1h-1zM32 3h1v1h-1zM33 3h1v1h-1zM34 3h1v1h-1zM36 3h1v1h-1zM0 4h1v1h-1zM2 4h1v1h-1zM3 4h1v1h-1zM4 4h1v1h-1zM6 4h1v1h-1zM11 4h1v1h-1zM12 4h1v1h-1zM14 4h1v1h-1zM16 4h1v1h-1zM19 4h1v1h-1zM22 4h1v1h-1zM26 4h1v1h-1zM30 4h1v1h-1zM32 4h1v1h-1zM33 4h1v1h-1zM34 4h1v1h-1zM36 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM8 5h1v1h-1zM9 5h1v1h-1zM12 5h1v1h-1zM14 5h1v1h-1zM16 5h1v1h-1zM17 5h1v1h-1zM18 5h1v1h-1zM21 5h1v1h-1zM23 5h1v1h-1zM24 5h1v1h-1zM27 5h1v1h-1zM28 5h1v1h-1zM30 5h1v1h-1zM36 5h1v1h-1zM0 6h1v1h-1zM1 6h1v1h-1zM2 6h1v1h-1zM3 6h1v1h-1zM4 6h1v1h-1zM5 6h1v1h-1zM6 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h1v1h-1zM28 6h1v1h-1zM30 6h1v1h-1zM31 6h1v1h-1zM32 6h1v1h-1zM33 6h1v1h-1zM34 6h1v1h-1zM35 6h1v1h-1zM36 6h1v1h-1zM8 7h1v1h-1zM9 7h1v1h-1zM13 7h1v1h-1zM15 7h1v1h-1zM17 7h1v1h-1zM18 7h1v1h-1zM24 7h1v1h-1zM26 7h1v1h-1zM28 7h1v1h-1zM2 8h1v1h-1zM3 8h1v1h-1zM4 8h1v1h-1zM6 8h1v1h-1zM8 8h1v1h-1zM12 8h1v1h-1zM13 8h1v1h-1zM14 8h1v1h-1zM18 8h1v1h-1zM19 8h1v1h-1zM20 8h1v1h-1zM21 8h1v1h-1zM24 8h1v1h-1zM29 8h1v1h-1zM30 8h1v1h-1zM31 8h1v1h-1zM34 8h1v1h-1zM35 8h1v1h-1zM36 8h1v1h-1zM1 9h1v1h-1zM2 9h1v1h-1zM4 9h1v1h-1zM8 9h1v1h-1zM13 9h1v1h-1zM14 9h1v1h-1zM15 9h1v1h-1zM21 9h1v1h-1zM22 9h1v1h-1zM26 9h1v1h-1zM27 9h1v1h-1zM28 9h1v1h-1zM29 9h1v1h-1zM30 9h1v1h-1zM34 9h1v1h-1zM35 9h1v1h-1zM0 10h1v1h-1zM1 10h1v1h-1zM2 10h1v1h-1zM4 10h1v1h-1zM5 10h1v1h-1zM6 10h1v1h-1zM7 10h1v1h-1zM8 10h1v1h-1zM9 10h1v1h-1zM10 10h1v1h-1zM11 10h1v1h-1zM14 10h1v1h-1zM15 10h1v1h-1zM16 10h1v1h-1zM19 10h1v1h-1zM20 10h1v1h-1zM21 10h1v1h-1zM24 10h1v1h-1zM30 10h1v1h-1zM31 10h1v1h-1zM36 10h1v1h-1zM1 11h1v1h-1zM3 11h1v1h-1zM4 11h1v1h-1zM11 11h1v1h-1zM14 11h1v1h-1zM16 11h1v1h-1zM17 11h1v1h-1zM19 11h1v1h-1zM20 11h1v1h-1zM21 11h1v1h-1zM22 11h1v1h-1zM23 11h1v1h-1zM24 11h1v1h-1zM26 11h1v1h-1zM28 11h1v1h-1zM30 11h1v1h-1zM35 11h1v1h-1zM1 12h1v1h-1zM5 12h1v1h-1zM6 12h1v1h-1zM8 12h1v1h-1zM11 12h1v1h-1zM16 12h1v1h-1zM19 12h1v1h-1zM23 12h1v1h-1zM25 12h1v1h-1zM30 12h1v1h-1zM32 12h1v1h-1zM33 12h1v1h-1zM34 12h1v1h-1zM35 12h1v1h-1zM36 12h1v1h-1zM0 13h1v1h-1zM1 13h1v1h-1zM4 13h1v1h-1zM5 13h1v1h-1zM7 13h1v1h-1zM8 13h1v1h-1zM10 13h1v1h-1zM11 13h1v1h-1zM12 13h1v1h-1zM25 13h1v1h-1zM26 13h1v1h-1zM28 13h1v1h-1zM29 13h1v1h-1zM31 13h1v1h-1zM33 13h1v1h-1zM34 13h1v1h-1zM35 13h1v1h-1zM1 14h1v1h-1zM5 14h1v1h-1zM6 14h1v1h-1zM8 14h1v1h-1zM9 14h1v1h-1zM10 14h1v1h-1zM11 14h1v1h-1zM12 14h1v1h-1zM24 14h1v1h-1zM27 14h1v1h-1zM29 14h1v1h-1zM31 14h1v1h-1zM32 14h1v1h-1zM33 14h1v1h-1zM36 14h1v1h-1zM0 15h1v1h-1zM1 15h1v1h-1zM3 15h1v1h-1zM8 15h1v1h-1zM9 15h1v1h-1zM10 15h1v1h-1zM27 15h1v1h-1zM28 15h1v1h-1zM31 15h1v1h-1zM32 15h1v1h-1zM2 16h1v1h-1zM4 16h1v1h-1zM5 16h1v1h-1zM6 16h1v1h-1zM8 16h1v1h-1zM10 16h1v1h-1zM12 16h1v1h-1zM25 16h1v1h-1zM27 16h1v1h-1zM28 16h1v1h-1zM30 16h1v1h-1zM32 16h1v1h-1zM34 16h1v1h-1zM35 16h1v1h-1zM1 17h1v1h-1zM3 17h1v1h-1zM4 17h1v1h-1zM7 17h1v1h-1zM8 17h1v1h-1zM9 17h1v1h-1zM10 17h1v1h-1zM11 17h1v1h-1zM12 17h1v1h-1zM24 17h1v1h-1zM25 17h1v1h-1zM26 17h1v1h-1zM29 17h1v1h-1zM33 17h1v1h-1zM5 18h1v1h-1zM6 18h1v1h-1zM7 18h1v1h-1zM8 18h1v1h-1zM10 18h1v1h-1zM11 18h1v1h-1zM24 18h1v1h-1zM27 18h1v1h-1zM35 18h1v1h-1zM36 18h1v1h-1zM0 19h1v1h-1zM4 19h1v1h-1zM8 19h1v1h-1zM9 19h1v1h-1zM10 19h1v1h-1zM11 19h1v1h-1zM24 19h1v1h-1zM28 19h1v1h-1zM29 19h1v1h-1zM30 19h1v1h-1zM32 19h1v1h-1zM33 19h1v1h-1zM35 19h1v1h-1zM1 20h1v1h-1zM2 20h1v1h-1zM3 20h1v1h-1zM6 20h1v1h-1zM8 20h1v1h-1zM10 20h1v1h-1zM11 20h1v1h-1zM12 20h1v1h-1zM24 20h1v1h-1zM25 20h1v1h-1zM29 20h1v1h-1zM30 20h1v1h-1zM31 20h1v1h-1zM32 20h1v1h-1zM34 20h1v1h-1zM36 20h1v1h-1zM1 21h1v1h-1zM3 21h1v1h-1zM4 21h1v1h-1zM7 21h1v1h-1zM11 21h1v1h-1zM24 21h1v1h-1zM25 21h1v1h-1zM31 21h1v1h-1zM2 22h1v1h-1zM4 22h1v1h-1zM6 22h1v1h-1zM9 22h1v1h-1zM10 22h1v1h-1zM11 22h1v1h-1zM12 22h1v1h-1zM25 22h1v1h-1zM26 22h1v1h-1zM27 22h1v1h-1zM28 22h1v1h-1zM29 22h1v1h-1zM33 22h1v1h-1zM34 22h1v1h-1zM35 22h1v1h-1zM36 22h1v1h-1zM3 23h1v1h-1zM4 23h1v1h-1zM8 23h1v1h-1zM24 23h1v1h-1zM25 23h1v1h-1zM28 23h1v1h-1zM31 23h1v1h-1zM33 23h1v1h-1zM36 23h1v1h-1zM1 24h1v1h-1zM4 24h1v1h-1zM6 24h1v1h-1zM8 24h1v1h-1zM11 24h1v1h-1zM12 24h1v1h-1zM13 24h1v1h-1zM18 24h1v1h-1zM19 24h1v1h-1zM24 24h1v1h-1zM26 24h1v1h-1zM28 24h1v1h-1zM29 24h1v1h-1zM34 24h1v1h-1zM35 24h1v1h-1zM36 24h1v1h-1zM0 25h1v1h-1zM1 25h1v1h-1zM5 25h1v1h-1zM8 25h1v1h-1zM10 25h1v1h-1zM11 25h1v1h-1zM12 25h1v1h-1zM13 25h1v1h-1zM15 25h1v1h-1zM16 25h1v1h-1zM17 25h1v1h-1zM20 25h1v1h-1zM21 25h1v1h-1zM25 25h1v1h-1zM27 25h1v1h-1zM30 25h1v1h-1zM31 25h1v1h-1zM32 25h1v1h-1zM34 25h1v1h-1zM35 25h1v1h-1zM0 26h1v1h-1zM2 26h1v1h-1zM4 26h1v1h-1zM5 26h1v1h-1zM6 26h1v1h-1zM10 26h1v1h-1zM11 26h1v1h-1zM12 26h1v1h-1zM13 26h1v1h-1zM14 26h1v1h-1zM15 26h1v1h-1zM17 26h1v1h-1zM20 26h1v1h-1zM21 26h1v1h-1zM22 26h1v1h-1zM23 26h1v1h-1zM24 26h1v1h-1zM27 26h1v1h-1zM28 26h1v1h-1zM32 26h1v1h-1zM33 26h1v1h-1zM36 26h1v1h-1zM0 27h1v1h-1zM8 27h1v1h-1zM9 27h1v1h-1zM11 27h1v1h-1zM13 27h1v1h-1zM14 27h1v1h-1zM16 27h1v1h-1zM17 27h1v1h-1zM19 27h1v1h-1zM23 27h1v1h-1zM26 27h1v1h-1zM27 27h1v1h-1zM31 27h1v1h-1zM32 27h1v1h-1zM33 27h1v1h-1zM36 27h1v1h-1zM0 28h1v1h-1zM3 28h1v1h-1zM5 28h1v1h-1zM6 28h1v1h-1zM7 28h1v1h-1zM8 28h1v1h-1zM11 28h1v1h-1zM12 28h1v1h-1zM13 28h1v1h-1zM14 28h1v1h-1zM16 28h1v1h-1zM18 28h1v1h-1zM19 28h1v1h-1zM20 28h1v1h-1zM21 28h1v1h-1zM22 28h1v1h-1zM23 28h1v1h-1zM25 28h1v1h-1zM27 28h1v1h-1zM28 28h1v1h-1zM29 28h1v1h-1zM30 28h1v1h-1zM31 28h1v1h-1zM32 28h1v1h-1zM33 28h1v1h-1zM8 29h1v1h-1zM9 29h1v1h-1zM10 29h1v1h-1zM12 29h1v1h-1zM14 29h1v1h-1zM16 29h1v1h-1zM18 29h1v1h-1zM19 29h1v1h-1zM21 29h1v1h-1zM23 29h1v1h-1zM25 29h1v1h-1zM26 29h1v1h-1zM27 29h1v1h-1zM28 29h1v1h-1zM32 29h1v1h-1zM0 30h1v1h-1zM1 30h1v1h-1zM2 30h1v1h-1zM3 30h1v1h-1zM4 30h1v1h-1zM5 30h1v1h-1zM6 30h1v1h-1zM9 30h1v1h-1zM10 30h1v1h-1zM12 30h1v1h-1zM15 30h1v1h-1zM18 30h1v1h-1zM19 30h1v1h-1zM24 30h1v1h-1zM25 30h1v1h-1zM28 30h1v1h-1zM30 30h1v1h-1zM32 30h1v1h-1zM33 30h1v1h-1zM36 30h1v1h-1zM0 31h1v1h-1zM6 31h1v1h-1zM10 31h1v1h-1zM11 31h1v1h-1zM13 31h1v1h-1zM18 31h1v1h-1zM19 31h1v1h-1zM22 31h1v1h-1zM24 31h1v1h-1zM28 31h1v1h-1zM32 31h1v1h-1zM0 32h1v1h-1zM2 32h1v1h-1zM3 32h1v1h-1zM4 32h1v1h-1zM6 32h1v1h-1zM8 32h1v1h-1zM10 32h1v1h-1zM11 32h1v1h-1zM14 32h1v1h-1zM15 32h1v1h-1zM17 32h1v1h-1zM18 32h1v1h-1zM19 32h1v1h-1zM23 32h1v1h-1zM25 32h1v1h-1zM27 32h1v1h-1zM28 32h1v1h-1zM29 32h1v1h-1zM30 32h1v1h-1zM31 32h1v1h-1zM32 32h1v1h-1zM34 32h1v1h-1zM36 32h1v1h-1zM0 33h1v1h-1zM2 33h1v1h-1zM3 33h1v1h-1zM4 33h1v1h-1zM6 33h1v1h-1zM8 33h1v1h-1zM10 33h1v1h-1zM13 33h1v1h-1zM16 33h1v1h-1zM22 33h1v1h-1zM24 33h1v1h-1zM25 33h1v1h-1zM26 33h1v1h-1zM27 33h1v1h-1zM28 33h1v1h-1zM30 33h1v1h-1zM32 33h1v1h-1zM0 34h1v1h-1zM2 34h1v1h-1zM3 34h1v1h-1zM4 34h1v1h-1zM6 34h1v1h-1zM8 34h1v1h-1zM9 34h1v1h-1zM10 34h1v1h-1zM12 34h1v1h-1zM13 34h1v1h-1zM14 34h1v1h-1zM15 34h1v1h-1zM17 34h1v1h-1zM20 34h1v1h-1zM21 34h1v1h-1zM22 34h1v1h-1zM25 34h1v1h-1zM26 34h1v1h-1zM28 34h1v1h-1zM33 34h1v1h-1zM34 34h1v1h-1zM36 34h1v1h-1zM0 35h1v1h-1zM6 35h1v1h-1zM10 35h1v1h-1zM12 35h1v1h-1zM13 35h1v1h-1zM14 35h1v1h-1zM18 35h1v1h-1zM20 35h1v1h-1zM21 35h1v1h-1zM22 35h1v1h-1zM24 35h1v1h-1zM27 35h1v1h-1zM28 35h1v1h-1zM30 35h1v1h-1zM31 35h1v1h-1zM33 35h1v1h-1zM36 35h1v1h-1zM0 36h1v1h-1zM1 36h1v1h-1zM2 36h1v1h-1zM3 36h1v1h-1zM4 36h1v1h-1zM5 36h1v1h-1zM6 36h1v1h-1zM9 36h1v1h-1zM10 36h1v1h-1zM12 36h1v1h-1zM14 36h1v1h-1zM15 36h1v1h-1zM16 36h1v1h-1zM18 36h1v1h-1zM20 36h1v1h-1zM24 36h1v1h-1zM25 36h1v1h-1zM26 36h1v1h-1zM27 36h1v1h-1zM29 36h1v1h-1zM30 36h1v1h-1zM31 36h1v1h-1zM34 36h1v1h-1zM35 36h1v1h-1zM36 36h1v1h-1z" fill="#191713"/><rect x="12.5" y="12.5" width="12" height="12" fill="#E8E3D5"/><polygon points="15.75,16.09 17.13,16.09 17.13,17.98 18.84,16.09 20.39,16.09 18.16,18.50 20.39,21.25 18.84,21.25 17.13,19.19 17.13,21.25 15.75,21.25" fill="#191713"/><rect x="15.41" y="21.94" width="6.19" height="0.69" fill="#FF4B1F"/></svg></div>
+        <div class="info">
+          <div class="sk">M-05 // SCAN TO OPEN</div>
+          <h3>扫码打开本档案</h3>
+          <div class="url">http://192.168.1.18:8765/index.html</div>
+          <div class="note">需与档案主机处于同一 Wi-Fi 网络</div>
+        </div>
+      </div>
+      <!--QR-END-->
+      <div class="cta"><a id="ctaMail" href="#">▸ 建立通讯 // 发送合作意向</a></div>
+    </section>
+  </main>
+</div>
+
+<!-- ============ AI 注解终端(致敬 1994 终端叙事) ============ -->
+<div id="ai">
+  <div class="ai-head" id="aiHead" title="点击收起/展开">
+    <span class="dot"></span><b>M-TERM // AI 注解</b><span class="min">▾</span>
+  </div>
+  <div class="ai-body" id="aiBody"></div>
+</div>
+
+<!-- ============ 页脚 ============ -->
+<footer>
+  <div class="barcode" aria-hidden="true"></div>
+  <div class="fnote">
+    UESC-94-MRN · 该档案基于 GRAPHIC REALISM 协议渲染 · 向 1994 致敬<br>
+    本页面为可交互简历模板 · 修改文件顶部 CONFIG 即可换成你的内容 · 不含任何真实赞助商
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   ★★★ 简历内容都在这里改 ★★★
+   把下面的内容换成你自己的信息即可,页面会自动渲染。
+   ============================================================ */
+const CONFIG = {
+  name: "Keyou",
+  role: "视觉设计师 · VISUAL DESIGNER",
+  status: "OPEN TO WORK",
+  meta: [
+    { k: "RUNNER ID · 档案号", v: "K-0428" },
+    { k: "出生年月 · DOB", v: "2004.04" },
+    { k: "坐标 · LOCATION", v: "江苏 · 丹阳" },
+    { k: "服役年限 · EXP", v: "3 年" },
+  ],
+  summary:
+    "从<b>镜架道具设计</b>起步的视觉设计师,走通<b>方案设计 → 视觉效果 → 实物落地</b>的完整链路;" +
+    "坚持自己独特的思路,也乐于把新工具收进个人工作流。曾因作品被客户记住," +
+    "离职后反被挖角出任总设计师——<b>懂客户想要什么</b>,是我最锋利的装备。",
+  sponsors: [
+    "PENTAX 门徒",
+    "更喜欢线上交流",
+    "蓝黄涩社会",
+  ],
+  skills: [
+    { code: "MDL-01", name: "Blender", pct: 90,
+      desc: "给足时间,几乎什么都能做——从构思、建模、渲染到视频,有自己的一套完整工作流",
+      tags: [["三维建模",1],["产品渲染",0],["动态视频",0]] },
+    { code: "MDL-02", name: "Adobe Photoshop", pct: 80,
+      desc: "除了冷门小巧思,几乎都能做",
+      tags: [["图像处理",1],["视觉合成",0]] },
+    { code: "MDL-03", name: "Adobe Illustrator", pct: 70,
+      desc: "日常工作主力软件之一,常用功能全部熟练",
+      tags: [["矢量图形",0],["版式设计",0]] },
+    { code: "MDL-04", name: "Adobe Premiere", pct: 60,
+      desc: "可独立完成视频剪辑:从素材整理、配乐到成片,带个人风格",
+      tags: [["剪辑",0],["配乐",0]] },
+    { code: "MDL-05", name: "Adobe Lightroom", pct: 60,
+      desc: "PENTAX 门徒的调色台——喜欢摄影,有个人摄影风格",
+      tags: [["摄影",0],["调色",0]] },
+  ],
+  jobs: [
+    { org: "成角科技", role: "总设计师", date: "2026 — 至今", current: true,
+      bullets: [
+        "被前客户挖角出任总设计师,负责从镜架设计到动画渲染的全链路视觉输出",
+        "现公司业务进入真空期,正寻求更大的创作舞台",
+      ],
+      results: ["挖角即任命"] },
+    { org: "荣华道具", role: "道具设计师", date: "2024 — 2026", current: false,
+      bullets: [
+        "担任道具设计师,负责镜架道具的方案设计与视觉呈现,多款独特造型广受客户喜爱",
+        "擅长理解客户没说出口的需求,作品比提案更接近客户想要的样子",
+      ],
+      results: ["客户主动挖角"] },
+    { org: "个人外包", role: "设计", date: "早期 · 自由接单", current: false,
+      bullets: [
+        "承接电商、舞美、展会等多场景设计外包,积累跨领域视觉经验",
+      ],
+      results: [] },
+  ],
+  education: [
+    { school: "建东职业技术学院", degree: "专科 · 计算机科学与技术", date: "2020.09 — 2023.06",
+      note: "" },
+  ],
+  certs: [],
+  comms: [
+    { k: "MAIL · 电子邮箱", v: "koyo2023@qq.com", href: "mailto:koyo2023@qq.com" },
+    { k: "VOICE · 电话", v: "166-5107-5428", href: "tel:+8616651075428" },
+    { k: "NET · Bilibili 主页", v: "@141575811", href: "https://space.bilibili.com/141575811" },
+  ],
+  aiLines: {
+    s1: "档案已解密:Keyou,视觉设计师,档案号 K-0428。左上角的 K 和二维码中央的 K 是同一枚——都归你。",
+    s2: "五件装备全部在线:Blender 九成,Adobe 四件套护航。留下一成,是给下一个项目准备的。",
+    s3: "被客户从荣华道具挖到成角科技出任总设计师——任务记录,永远比自夸更有说服力。",
+    s4: "计算机科班出身,工具学得明白;但殖民地发奖励看的是产出,不是文凭。",
+    s5: "邮箱、电话、B 站都在这了。你说过更喜欢线上交流——那就从这个页面开始。",
+  },
+};
+/* ================= 以下为渲染与交互逻辑,一般无需改动 ================= */
+
+// ---------- 基础填充 ----------
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s);
+document.title = CONFIG.name + " // UESC 人事档案";
+$("#headName").textContent = CONFIG.name;
+$("#bigName").textContent = CONFIG.name;
+$("#bigName").dataset.t = CONFIG.name;
+$("#bigRole").textContent = CONFIG.role;
+$("#statusChip").textContent = CONFIG.status;
+$("#metaGrid").innerHTML = CONFIG.meta.map(m =>
+  `<div class="meta-cell"><div class="k">${m.k}</div><div class="v">${esc(m.v)}</div></div>`).join("");
+$("#summary").innerHTML = CONFIG.summary;
+// 跑马灯:序列反复加倍,保证循环半程始终宽于视口,任何屏幕、任何窗口宽度都不露空
+const seqHTML = CONFIG.sponsors.map(s => `<span>${esc(s)}</span>`).join("");
+const tickerLane = $("#tickerLane");
+function ensureTicker(){
+  let unit = seqHTML.repeat(4);
+  tickerLane.innerHTML = unit + unit;
+  while (tickerLane.scrollWidth / 2 < window.innerWidth + 60) {
+    unit += unit;
+    tickerLane.innerHTML = unit + unit;
+  }
+}
+ensureTicker();
+window.addEventListener("resize", ensureTicker);
+$("#ctaMail").href = (CONFIG.comms[0] && CONFIG.comms[0].href) || "#";
+
+// ---------- 装备(技能) ----------
+$("#loadout").innerHTML = CONFIG.skills.map(s => `
+  <div class="module">
+    <div class="mk">${esc(s.code)} // MODULE</div>
+    <h3>${esc(s.name)}</h3>
+    <div class="desc">${esc(s.desc)}</div>
+    <div class="track"><i data-pct="${s.pct}"></i><span class="pct">${s.pct}%</span></div>
+    <div class="tags">${s.tags.map(t => `<em class="${t[1] ? "hot" : ""}">${esc(t[0])}</em>`).join("")}</div>
+  </div>`).join("");
+
+// ---------- 任务记录(经历) ----------
+$("#timeline").innerHTML = CONFIG.jobs.map(j => `
+  <div class="tl-item ${j.current ? "current" : ""}">
+    <div class="tl-head">
+      <span class="org">${esc(j.org)}</span>
+      <span class="role">${esc(j.role)}</span>
+      <span class="date">${esc(j.date)}</span>
+    </div>
+    <ul>${j.bullets.map(b => `<li>${esc(b)}</li>`).join("")}</ul>
+    ${j.results && j.results.length ? `<div class="result-chips">${j.results.map(r => `<em>${esc(r)}</em>`).join("")}</div>` : ""}
+  </div>`).join("");
+
+// ---------- 训练 ----------
+$("#edu").innerHTML = `
+  <div class="card" style="flex:2 1 380px">
+    <span class="tag">ACADEMY</span>
+    ${CONFIG.education.map(e => `
+      <div class="tl-head"><span class="org">${esc(e.school)}</span>
+      <span class="role">${esc(e.degree)}</span><span class="date">${esc(e.date)}</span></div>
+      ${e.note ? `<p style="margin-top:10px;font-size:13.5px;line-height:1.9">${esc(e.note)}</p>` : ""}`).join("")}
+  </div>
+  ${CONFIG.certs && CONFIG.certs.length ? `
+  <div class="card">
+    <span class="tag">CERTS</span>
+    <div class="mk" style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--ink-soft)">证书资质 // CERTIFICATES</div>
+    <div class="cert-list">${CONFIG.certs.map(c => `<em>${esc(c)}</em>`).join("")}</div>
+  </div>` : ""}`;
+
+// ---------- 通讯 ----------
+$("#comms").innerHTML = CONFIG.comms.map(c => `
+  <a class="comm" href="${esc(c.href)}">
+    <div class="ck">${esc(c.k)}</div>
+    <div class="cv">${esc(c.v)}</div>
+  </a>`).join("");
+
+// ---------- 区块切换 ----------
+const tabs = [...document.querySelectorAll("nav .tab")];
+const panels = [...document.querySelectorAll(".panel")];
+function go(id){
+  tabs.forEach(t => t.classList.toggle("active", t.dataset.sec === id));
+  panels.forEach(p => p.classList.toggle("active", p.id === id));
+  typeAI(CONFIG.aiLines[id] || "");
+  if (id === "s2") animateBars();
+}
+tabs.forEach(t => t.addEventListener("click", () => go(t.dataset.sec)));
+function animateBars(){
+  document.querySelectorAll(".track i").forEach(el => {
+    el.style.width = "0";
+    requestAnimationFrame(() => requestAnimationFrame(() => { el.style.width = el.dataset.pct + "%"; }));
+  });
+}
+
+// ---------- AI 终端逐字打字 ----------
+let typeTimer = null;
+function typeAI(text){
+  const body = $("#aiBody");
+  clearInterval(typeTimer);
+  body.textContent = "";
+  let i = 0;
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches){ body.textContent = text; return; }
+  typeTimer = setInterval(() => {
+    body.textContent = text.slice(0, ++i);
+    if (i >= text.length) clearInterval(typeTimer);
+  }, 38);
+}
+$("#aiHead").addEventListener("click", () => {
+  $("#ai").classList.toggle("min");
+  $("#ai .min").textContent = $("#ai").classList.contains("min") ? "▸" : "▾";
+});
+
+// ---------- 主题切换 ----------
+const themeBtn = $("#themeBtn");
+function setTheme(night){
+  document.body.classList.toggle("night", night);
+  localStorage.setItem("mr-theme", night ? "night" : "day");
+}
+themeBtn.addEventListener("click", () => setTheme(!document.body.classList.contains("night")));
+if (localStorage.getItem("mr-theme") === "night") setTheme(true);
+// 小屏默认收起 AI 终端,不挡内容
+if (window.innerWidth < 640){
+  $("#ai").classList.add("min");
+  $("#ai .min").textContent = "▸";
+}
+
+// ---------- 打印 ----------
+$("#printBtn").addEventListener("click", () => window.print());
+
+// ---------- 键盘快捷键 ----------
+document.addEventListener("keydown", (e) => {
+  if (e.target.matches("input,textarea")) return;
+  const n = parseInt(e.key, 10);
+  if (n >= 1 && n <= tabs.length) go("s" + n);
+  if (e.key === "t" || e.key === "T") themeBtn.click();
+  if (e.key === "p" || e.key === "P") window.print();
+});
+
+// ---------- 启动接入动画 ----------
+const bootLines = [
+  "> UESC 人事档案终端 v9.4 // TAU CETI IV 节点",
+  "> 载入档案: " + CONFIG.name + " ...",
+  "> 校验图形写实协议 [GRAPHIC REALISM] ... ",
+  "> 渲染模块: 平涂表面 / 无锈蚀 / 无螺丝 ... ",
+  "> 载入跑马灯赞助协议 ... ",
+  "> 等待跑者接入 _",
+];
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const boot = $("#boot"), log = $("#bootlog"), bar = $("#bootbar"), enterBtn = $("#bootEnter");
+let bi = 0, bootDone = false;
+function finishBoot(){
+  if (bootDone) return; bootDone = true;
+  boot.classList.add("done");
+  typeAI(CONFIG.aiLines.s1);
+  setTimeout(animateBars, 400);
+}
+function nextLine(){
+  if (bootDone) return;
+  if (bi < bootLines.length){
+    const raw = bootLines[bi++];
+    log.innerHTML += `<span>${esc(raw)}${raw.includes("...") ? "<span class='ok'>OK</span>" : ""}\n</span>`;
+    bar.style.width = Math.round(bi / bootLines.length * 100) + "%";
+    setTimeout(nextLine, reduceMotion ? 0 : 330);
+  } else {
+    enterBtn.classList.add("show");
+  }
+}
+function startBoot(){ setTimeout(nextLine, 200); }
+boot.addEventListener("click", finishBoot);
+enterBtn.addEventListener("click", (e) => { e.stopPropagation(); finishBoot(); });
+startBoot();
+
+// 徽标彩蛋:连点 5 次切换夜晚终端模式
+let clicks = 0, clickTimer = null;
+$("#emblem").addEventListener("click", () => {
+  clicks++; clearTimeout(clickTimer);
+  clickTimer = setTimeout(() => clicks = 0, 900);
+  if (clicks >= 5){ clicks = 0; setTheme(!document.body.classList.contains("night")); }
+});
+</script>
+</body>
+</html>
