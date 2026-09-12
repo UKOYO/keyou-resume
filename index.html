@@ -337,7 +337,10 @@ footer .fnote{font-family:var(--mono);font-size:10.5px;letter-spacing:1px;color:
   .hgroup .who{font-size:13px}
   .btn{padding:6px 9px;font-size:11px}
   .chip{font-size:10px;padding:3px 8px}
-  nav button.tab{flex:1 0 auto;justify-content:center;padding:10px 8px;font-size:13px;gap:6px}
+  nav{position:static;flex:0 0 auto;display:grid;grid-template-columns:1fr 1fr;gap:0;overflow:visible;height:auto;width:100%;align-self:stretch;border-right:0;border-bottom:var(--line);padding:0}
+  nav button.tab{justify-content:center;padding:11px 6px;font-size:13px;gap:6px;border-left:0;border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);border-top:0}
+  nav button.tab:nth-child(3),nav button.tab:nth-child(5),nav button.tab:last-child{border-right:0}
+  nav button.tab:last-of-type{grid-column:1 / -1;border-bottom:0}
   nav button.tab .no{font-size:10px}
   nav button.tab .en{display:none}
   main{padding:16px 12px 150px}
